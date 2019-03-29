@@ -1,0 +1,6 @@
+[machines]
+dns
+mail
+
+[networks]
+DMZ

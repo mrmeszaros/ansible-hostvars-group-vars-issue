@@ -1,0 +1,28 @@
+---
+- name: Ansible hostvars issue
+  hosts: machines
+  gather_facts: no
+  tasks:
+    - name: REF Variable values
+      debug:
+        var: ip_addr
+
+    - name: BUG The group var does not get fully resolved via hostvars
+      debug:
+        var: hostvars.dns.ip_addr
+
+    - name: BUG The set_fact also fails to correctly resolve group_vars
+      set_fact:
+        name_server: "{{ hostvars.dns.ip_addr }}"
+
+    - name: BUG The variable set by set_fact uses incorrect (per-host) context
+      debug:
+        var: name_server
+
+    - name: REF Resolving `hostvars.dns.ip_addr` should use the context of the host `dns`
+      set_fact:
+        name_server: 192.168.{{ hostvars[hostvars.dns.subnet].id }}.{{ hostvars.dns.machine_id }}
+
+    - name: REF Result of the correctly resolved `hostvars.dns.ip_addr` variable
+      debug:
+        var: name_server
